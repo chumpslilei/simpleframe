@@ -1,6 +1,7 @@
 package com.lilei.framework;
 
 import com.lilei.framework.bean.Handler;
+import com.lilei.framework.helper.BeanHelper;
 import com.lilei.framework.helper.ConfigHelper;
 import com.lilei.framework.helper.ControllerHelper;
 import com.lilei.framework.helper.HelperLoader;
@@ -14,6 +15,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 请求转发器
@@ -44,8 +48,16 @@ public class DispatcherServlet extends HttpServlet {
         Handler handler = ControllerHelper.getHandler(requestMethod,requestPath);
         if (handler != null){
             //获取Controller类及Bean实例
-            Class<?> controller = handler.getControllerClass();
-
+            Class<?> controllerClass = handler.getControllerClass();
+            Object controllerBean = BeanHelper.getBean(controllerClass);
+            //创建请求参数对象对象
+            Map<String,Object> paramMap = new HashMap<String,Object>();
+            Enumeration<String> paramNames = req.getParameterNames();
+            while (paramNames.hasMoreElements()){
+                String paramName = paramNames.nextElement();
+                String paramValue = req.getParameter(paramName);
+                paramMap.put(paramName,paramValue);
+            }
         }
     }
 }
